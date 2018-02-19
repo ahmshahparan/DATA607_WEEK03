@@ -1,0 +1,91 @@
+---
+title: "Data 607 Week 03"
+author: "A H M Shahparan"
+date: "2/18/2018"
+output: html_document
+---
+
+## Chapter 8 - Problem 03
+
+###Packages installation
+First, we will install the stringr package to convert a string to a vector.
+```{r}
+library(stringr)
+```
+
+###Loading Data
+```{r}
+raw.data <- "555-1239Moe Szyslak(636) 555-0113Burns, C. Montgomery555-6542Rev. Timothy Lovejoy555 8904Ned Flanders636-555-3226Simpson, Homer5543642Dr. Julius Hibbert"
+#From textbook. Extracts names only.
+unformatted_name <- unlist(str_extract_all(raw.data, "[[:alpha:]., ]{2,}"))
+unformatted_name
+```
+1) Use the tools of this chapter to rearrange the vector so that all elements conform to the standard first_name last_name.
+```{r}
+formatted_name <- str_replace_all(unformatted_name, '([:graph:]+?), ([:print:]+)', '\\2 \\1')
+formatted_name
+table1 <- data.frame(unformatted_name,formatted_name)
+table1
+```
+
+2) Construct a logical vector indicating whether a character has a title (i.e., Rev. and Dr.).
+```{r}
+with_title <- str_detect(formatted_name, "[[:alpha:]]{2,3}[.]")
+table2 <- data.frame(formatted_name,with_title)
+table2
+```
+
+3) Construct a logical vector indicating whether a character has a second name.
+```{r}
+with_second_name <- str_detect(unformatted_name," [A-z]{1}\\. ")
+table3 <- data.frame(unformatted_name,with_second_name)
+table3
+```
+
+##Chapter 8 - Problem 04
+Describe the types of strings that conform to the following regular expressions and construct an example that is matched by the regular expression.
+
+1) [0-9]+\\$
+```{r}
+#This matches the vector containing strings with continuous numbers followed by a dollar sign at the end. As example:
+
+mixed <- c("How many zeros in 1000000000000000$?")
+extracted <- str_match(mixed, '[0-9]+\\$')
+extracted
+```
+2) \\b[a-z]{1,4}\\b
+```{r}
+#This matches the vector containing strings with one to four continuous lowercase letters surrounded by word edges. As example:
+mixed <- c("I am so happy that you showed up. Thank you so much!")
+unlist(str_extract_all(mixed, '\\b[a-z]{1,4}\\b'))
+```
+3) .*?\\.txt$
+```{r}
+#This matches the vector containing the entirety of any string that concludes with the four characters ‘.txt’. 
+mixed <- c("this is not a file.txt", "but this is a file.txt", "this is .txt file")
+unlist(str_extract_all(mixed, ".*?\\.txt$"))
+```
+4) \\d{2}/\\d{2}/\\d{4}
+```{r}
+#This matches the vector containing strings that have a pattern of two digits, a forward slash, another two digits, another forward slash, and then four more digits.
+mixed <- c("12/10/1988 12/100/1988 120/10/1988")
+unlist(str_extract_all(mixed, "\\d{2}/\\d{2}/\\d{4}"))
+```
+5) <(.+?)>.+?</\\1>
+```{r}
+#This matches the vectors containing strings closed by ending and corresponding closing tags.
+exampleE <- c("<head><bold>Testing</bold></>", "<body>Testing 1 2 3...</body>")
+unlist(str_extract_all(exampleE, "<(.+?)>.+?</\\1>"))
+```
+
+##Chapter 8 - Problem 09
+The following code hides a secret message. Crack it with R and regular expressions. Hint: Some of the characters are more revealing than others! The code snippet is also available in the materials at www.r-datacollection.com.
+```{r}
+secret_code <- 'clcopCow1zmstc0d87wnkig7OvdicpNuggvhryn92Gjuwczi8hqrfpRxs5Aj5dwpn0TanwoUwisdij7Lj8kpf03AT5Idr3coc0bt7yczjatOaootj55t3Nj3ne6c4Sfek.r1w1YwwojigOd6vrfUrbz2.2bkAnbhzgv4R9i05zEcrop.wAgnb.SqoU65fPa1otfb7wEm24k6t3sR9zqe5fy89n6Nd5t9kc4fE905gmc4Rgxo5nhDk!gr'
+message_found <- unlist(str_extract_all(secret_code, "[[:upper:].!]{1,}"))
+message_found
+message_found <- str_replace_all(paste(message_found, collapse = ''), "[.]", " ")
+message_found
+```
+
+
